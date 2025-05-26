@@ -1,3 +1,12 @@
+const btn_container = document.querySelector(".btn");
+
+btn_container.addEventListener("click", (event) => {
+    let targeted_btn = event.target;
+    if (targeted_btn.classList.contains('number')){
+        write_on_screen(targeted_btn.textContent);
+    }
+})
+
 function add(a,b){
     return a+b;
 }
@@ -29,8 +38,8 @@ function operate(a,operator,b){
     }
 }
 
-// console.log(operate(1,'+',2));
-// console.log(operate(1,'-',2));
-// console.log(operate(1,'*',2));
-// console.log(operate(1,'/',2));
-// console.log(operate(0,'/',1));
+function write_on_screen(number){
+    console.log(number);
+}
+
+
