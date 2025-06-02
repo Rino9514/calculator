@@ -1,8 +1,15 @@
+const body = document.querySelector("body");
 const btn_container = document.querySelector(".btn");
 const entry_screen = document.querySelector(".entry");
 const equation_screen = document.querySelector(".equation");
 
 let first_entry = '';
+let operand = '';
+let second_entry = '';
+let should_reset = false;
+
+const NB_MAX_DIGITS = 10;
+
 
 btn_container.addEventListener("click", (event) => {
     let targeted_btn = event.target;
@@ -22,13 +29,15 @@ btn_container.addEventListener("click", (event) => {
 
 })
 
-function operate(string){
-    let operator = '';
-    let a,b = 0;
-    a = Number(string.split(' ')[0]);
-    b = Number(string.split(' ')[2]);
-    operator = string.split(' ')[1];
+body.addEventListener("keyup",(event)  => {
+    let authorize_key = "0123456789./*-+EnterBackspaceDeleteu";
+    if (authorize_key.includes(event.key)){
+        const button = document.querySelector(`button[data-key="${event.key}"]`);
+        button.click();
+    }
+});
 
+function operate(a,operator,b){
     if (operator==="+"){
         return a+b;
     }
@@ -69,12 +78,24 @@ function clear_del_opposite(symbol){
     } else {
         equation_screen.textContent = '';
         first_entry = '';
+        operand = '';
+        second_entry = '';
+        should_reset = false;
     }
     entry_screen.textContent = text;
 }
 
 function write_on_screen(number_operator){
     let text = "";
+    // reset if there is a last operation
+    if (should_reset) {
+        entry_screen.textContent = '';
+        equation_screen.textContent = '';
+        should_reset = false;
+        first_entry='';
+        operand='';
+        second_entry = '';
+    }
     // careful of the length to not overflow the div and adding to many .
     if (entry_screen.textContent.length + number_operator.length<11){
         if (number_operator === '.' && entry_screen.textContent.includes('.')){
@@ -102,19 +123,70 @@ function write_on_screen(number_operator){
 
 
 function write_second_screen(operator){
-    let result,text = '';
-
     if(operator !== '='){
-        // previous number and previous operator
-        text = entry_screen.textContent + ' '+ operator + ' ';
-        first_entry = text;
-        equation_screen.textContent = text;
-        entry_screen.textContent = '0';
+        // changing operator before enter a second element
+        if(entry_screen.textContent !== ''){
+            first_entry = Number(entry_screen.textContent);
+        }
+        operand = operator;
+        if(entry_screen.textContent[0] === "-"){
+            equation_screen.textContent = '(' + first_entry + ')' + ' '+ operand + ' ';
+        } else {
+            equation_screen.textContent = first_entry + ' '+ operand + ' ';
+        }
+        entry_screen.textContent = '';
+        should_reset = false;
     } else {
-        result = operate(first_entry + entry_screen.textContent);
-        // previous number and operator and equal
-        text =  first_entry + ' '+ entry_screen.textContent + ' ' + operator;
-        equation_screen.textContent = text;
-        entry_screen.textContent = result;
+        if(entry_screen.textContent !== '' && operand !== ''){
+            // did the '=' btn has been press ? 
+            if (!should_reset){
+                second_entry = Number(entry_screen.textContent);
+                should_reset = true;
+            } else {
+                // normal behavior of calculator when we press multiple time '='
+                first_entry = Number(entry_screen.textContent);
+            }
+            // writing on screen
+            if (String(first_entry)[0] === "-"){
+                equation_screen.textContent =  '(' + first_entry + ')' + ' '+ operand + ' '+ second_entry;
+            } else if (String(second_entry)[0] === "-"){
+                equation_screen.textContent =  first_entry + ' '+ operand + ' '+ '(' + second_entry + ')';
+            } else {
+                equation_screen.textContent =  first_entry + ' '+ operand + ' '+ second_entry;
+            }
+            entry_screen.textContent = formatNumber(operate(first_entry, operand,second_entry));
+        }
+    }
+}
+
+
+function formatNumber(num) {
+    let decimal = 0;
+    let integer = 0;
+    let num_string = String(num);
+    // handle the max and min 
+    if (num >= 9999999999){
+        return "9999999999";
+    } else if (num <= -9999999999){
+        return "-9999999999";
+    // handle decimals number
+    } else if (num_string.includes('.')){
+        integer  = num_string.split('.')[0];
+        decimal = num_string.split('.')[1];
+        // the num is OK
+        if (num_string.length < NB_MAX_DIGITS + 1){
+            return num_string;
+        }
+        // integer part is to high to have decimal part
+        if (integer.length > NB_MAX_DIGITS - 2){
+            return integer;
+        }
+        // cut of the decimal part
+        if (num_string.length > NB_MAX_DIGITS){
+            return integer + '.' + decimal.slice(0,NB_MAX_DIGITS - 1 - integer.length);
+        }
+    }
+    else {
+        return num_string;
     }
 }

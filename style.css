@@ -15,6 +15,8 @@ body{
     gap: 10px;
     width: 500px;
     height: 800px;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .main_container button{
@@ -41,8 +43,7 @@ body{
     flex-direction: column;
     background-color: rgb(80, 80, 80);
     height:100%;
-    border-radius: 20px ;
-    
+    border-radius: 20px ;    
 }
 .equation{
     display: flex;
@@ -50,9 +51,9 @@ body{
     align-items: center;    
     height:35%;
     font-size: 35px;
-    background-color: rgb(172, 46, 46);
+    padding-left: 10px;
+    padding-right:10px;
 }
-
 
 .entry{
     display: flex;
@@ -60,8 +61,12 @@ body{
     align-items: center;
     height:65%;
     font-size: 80px;
-    background-color: rgb(25, 161, 66);
+    padding-left: 10px;
+    padding-right:10px;
+    color: white;
+
 }
+
 .btn{
     display: flex;
     align-items: flex-start;
@@ -72,4 +77,12 @@ body{
     gap: 1px;
     width: 500px;
     height: 800px;
+}
+
+.footer{
+    width: 100%;
+    text-align: center;
+    color: dimgray;
+    font-size: 0.6em;
+    margin-top: 15px;
 }
